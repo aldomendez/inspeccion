@@ -14,7 +14,7 @@ r = new Ractive
       ]
     step:0
     userNumber:''
-    carrier:''
+    carrier:'155772978'
     carrierContents:[
       {CARRIER_SITE:1,STATUS:true
       },{CARRIER_SITE:2,STATUS:true
@@ -71,8 +71,15 @@ epoxy = do()->
       components = r.get 'carrierContents'
 
       try
-        if user is '' then throw {message:'Ingresa un numero de lote', path:'user'}
+        if user is '' then throw {message:'Ingresa un NUMERO DE USUARIO', path:'user'}
         if user.length > 10 then throw {message:'Numero de usuario demasiado largo', path:'user'}
+        if carrier.length isnt 9 then throw {message:'Numero de carrier cambio, Ingresa el carrier de nuevo', path:'carrier'}
+        cmpt = components.map (el, i)->
+          if el.STATUS is false
+            return el
+        console.log cmpt
+            
+        r.set 'error', undefined
       catch e
         console.log e
         r.set 'error', e
@@ -101,5 +108,5 @@ r.observe 'carrier', (nVal, oVal)->
     
     
   
-
+window.epoxy = epoxy
 window.r = r

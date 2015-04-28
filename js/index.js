@@ -9,7 +9,7 @@
       failMode: ['Selecciona un modo de falla', "Desprendido", "Dañado", "Contaminado", "Fuera de posicion", "Exceso de epoxy"],
       step: 0,
       userNumber: '',
-      carrier: '',
+      carrier: '155772978',
       carrierContents: [
         {
           CARRIER_SITE: 1,
@@ -103,14 +103,14 @@
         return promise;
       },
       validate: function() {
-        var carrier, components, e, user;
+        var carrier, cmpt, components, e, user;
         user = r.get('userNumber');
         carrier = r.get('carrier');
         components = r.get('carrierContents');
         try {
           if (user === '') {
             throw {
-              message: 'Ingresa un numero de lote',
+              message: 'Ingresa un NUMERO DE USUARIO',
               path: 'user'
             };
           }
@@ -120,6 +120,19 @@
               path: 'user'
             };
           }
+          if (carrier.length !== 9) {
+            throw {
+              message: 'Numero de carrier cambio, Ingresa el carrier de nuevo',
+              path: 'carrier'
+            };
+          }
+          cmpt = components.map(function(el, i) {
+            if (el.STATUS === false) {
+              return el;
+            }
+          });
+          console.log(cmpt);
+          return r.set('error', void 0);
         } catch (_error) {
           e = _error;
           console.log(e);
@@ -155,6 +168,8 @@
       });
     }
   });
+
+  window.epoxy = epoxy;
 
   window.r = r;
 

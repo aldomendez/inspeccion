@@ -25,9 +25,12 @@
 </div>
 
 {{#partial sampleForm}}
-<form class="ui small form segment">
+<form class="ui small form segment {{#if error}}error{{/if}}">
+  <div class="ui error message">
+    <div class="header">{{error.message}}</div>
+  </div>
   <div class="two fields">
-    <div class="required field">
+    <div class="required field {{#if error.path == 'user'}}error{{/if}}">
       <label>Numero de usuario</label>
       <div class="field">
         <input type="text" value="{{userNumber}}">
@@ -72,21 +75,21 @@
         <!-- </div> -->
       </td>
       <td>
-        <select class="ui search dropdown {{#if this.STATUS}}disabled{{/if}}">
+        <select class="ui search dropdown {{#if this.STATUS}}disabled{{/if}}" value="{{this.COMPONENT}}">
           {{#each components}}
             <option value="{{this}}">{{this}}</option>
           {{/each}}
         </select>
       </td>
       <td>
-        <select class="ui search dropdown {{#if this.STATUS}}disabled{{/if}}">
+        <select class="ui search dropdown {{#if this.STATUS}}disabled{{/if}}" value="{{this.FAILMODE}}">
           {{#each failMode}}
             <option value="{{this}}">{{this}}</option>
           {{/each}}
         </select>
       </td>
       <td>
-        <input type="text" value="{{COMMENT}}">
+        <input type="text" value="{{this.COMMENT}}">
       </td>
     </tr>
       {{/each}}
@@ -110,8 +113,5 @@
 
 
 
-  <div class="ui error message">
-    <div class="header">We noticed some issues</div>
-  </div>
 </form>
 {{/partial}}
