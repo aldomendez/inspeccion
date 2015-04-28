@@ -5,9 +5,9 @@
         Avago
       </a>
       <a class="item">
-        <i class="book icon"></i> Control de epoxys
+        <i class="book icon"></i> Inspecci&oacute;n Visual
       </a>
-      <a class="item" on-click="refreshLive"><i class="refresh icon"></i>Refresh</a>
+      <!-- <a class="item" on-click="refreshLive"><i class="refresh icon"></i>Refresh</a> -->
       <!-- <div class="right menu">
         <div class="item">
           <span class="ui label red">not finished</span>
@@ -17,110 +17,101 @@
   </div>
 </div>
 <div class="row">
-  <div class="four wide column">
-      
-    <div class="ui vertical menu">
-      <div class="header item">Epoxys activos</div>
-      {{#each allowedEpoxyTypes}}
-      <a class="item" on-click="createNewEpoxy">
-        {{this}}
-        {{#if epoxys[this]}}
-        <div class="ui teal label">{{epoxys[this].COMMENTS}}</div>
-        {{/if}}
-      </a>
-      {{/each}}
-    </div>
-
-  </div>
-  <div class="twelve wide column">
-
-    {{#if step==0}}
-      {{>start}}
-    {{/if}}
-    {{#if step==1}}
-      {{>disposeSyringe}}
-    {{/if}}
-    {{#if step==2}}
-      {{>captureForm}}
-    {{/if}}
-
+  <div class="sixteen wide column">
+       
+    {{>sampleForm}}
+    
   </div>
 </div>
 
-{{#partial start}}
-<h2 class="ui header">
-  <div class="content">Control de epoxys</div>
-  <div class="sub header"></div>
-</h2>
-<p>Este control de epoxys te muestra en panel derecho los numeros de las geringas que estan activas (si hay). Justo al lado del tipo de geringa a la que pertenece</p>
-<p>En caso de que quieras registar una nueva geringa, solo tienes que hacer <code>click</code> en el tipo de geringa que quieras
-dar de alta y llenar los campos correspondientes</p>
-{{/partial}}
-
-{{#partial disposeSyringe}}
-{{^askDisposeComment}}
-<h2 class="ui header">
-  <div class="content">Geringa activa</div>
-  <!-- <div class="sub header">Solo puede haber una geringa activa</div> -->
-</h2>
-<p class="ui segment">Solamente puede haber una geringa activa, puedes borrar la geringa 
-<b>{{epoxys[newSyringe.type].LOT_NUMBER}}</b> y registrar una nueva</p>
-<div class="positive ui button" on-click="returnToStart"><b>Regresar</b> y dejar la jeringa que esta activa</div>
-<div class="negative ui button" on-click="askForComment"><b>Tirar</b> la geringa activa y registrar una nueva</div>
-{{/askDisposeComment}}
-{{#askDisposeComment}}
-<form action="" class="ui form">
-  <div class="field required">
-    <label for="comment">Por que vas a tirar la geringa (caracteres restantes:{{450 - newSyringe.disposeComment.length}})</label>
-    <textarea name="comment" id="" cols="30" rows="10" value="{{newSyringe.disposeComment}}"></textarea>
-  </div>
-</form>
-<div class="ui divider hidden"></div>
-<div class="positive ui button" on-click="returnToStart"><b>Regresar</b> y dejar la jeringa que esta activa</div>
-<div class="negative ui button" on-click="validateAndDisposeSyringe"><b>Tirar</b> la geringa activa y registrar una nueva</div>
-{{/askDisposeComment}}
-
-{{/partial}}
-
-{{#partial captureForm}}
-<form class="ui form {{#error}}error{{/error}}">
-  <h2 class="ui header">
-  <div class="content">Registro de epoxys</div>
-  <div class="sub header"></div>
-</h2>
+{{#partial sampleForm}}
+<form class="ui small form segment">
   <div class="two fields">
-    <div class="field">
-      <label>Tipo de epoxy</label>
-      <select class="ui search dropdown" value='{{newSyringe.type}}'>
-        {{#each allowedEpoxyTypes}}
-        <option>{{this}}</option>
-        {{/each}}
-      </select>
-    </div>
-    <div class="field {{#if error.path == 'lot'}}error{{/if}}">
-      <label>Lote</label>
+    <div class="required field">
+      <label>Numero de usuario</label>
       <div class="field">
-        <input type="text" name="lote" placeholder="" value="{{newSyringe.lot}}">
+        <input type="text" value="{{userNumber}}">
+      </div>
+    </div>
+    <div class="field">
+      <div class="two fields">
+        <div class="required field">
+          <label>Numero de Carrier</label>
+          <div class="field">
+            <input type="text" value="{{carrier}}">
+          </div>
+        </div>
+        
+        <div class="field">
+          <label>&nbsp;</label>
+          <button class="fluid ui button" on-click="cargarCarrier">Cargar carrier</button>
+        </div>
       </div>
     </div>
   </div>
-  <div class="two fields {{#if error.path == 'expiration'}}error{{/if}}">
-    <div class="field">
-      <label for="">Fecha de expiracion</label>
-      <input type="date" name="expDate" value="{{newSyringe.expiration}}">
-    </div>
-    <div class="field {{#if error.path == 'operator'}}error{{/if}}">
-      <label for="">Numero de operador</label>
-      <input type="text" name="operator" value="{{newSyringe.operator}}">
-    </div>
-  </div>
+
+<table class="ui compact celled definition table">
+  <thead class="full-width">
+    <tr>
+      <th>Numero de Serie</th>
+      <th>Posicion</th>
+      <th>Pass</th>
+      <th>Componente</th>
+      <th>Modo de Falla</th>
+      <th>Comentarios</th>
+    </tr>
+  </thead>
+  <tbody>
+      {{#each carrierContents}}
+    <tr>
+      <td>{{this.SERIAL_NUM}}</td>
+      <td class="collapsing">{{this.CARRIER_SITE}}</td>
+      <td class="collapsing">
+        <!-- <div class="ui checkbox"> -->
+            <input type="checkbox" checked='{{this.STATUS}}'> <label></label>
+        <!-- </div> -->
+      </td>
+      <td>
+        <select class="ui search dropdown {{#if this.STATUS}}disabled{{/if}}">
+          {{#each components}}
+            <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </td>
+      <td>
+        <select class="ui search dropdown {{#if this.STATUS}}disabled{{/if}}">
+          {{#each failMode}}
+            <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </td>
+      <td>
+        <input type="text" value="{{COMMENT}}">
+      </td>
+    </tr>
+      {{/each}}
+  </tbody>
+  <tfoot class="full-width">
+    <tr>
+      <th></th>
+      <th colspan="6">
+        <div class="ui right floated small green button">
+          Guardar
+        </div>
+      </th>
+    </tr>
+  </tfoot>
+</table>
+
+
+
+
+
+
+
 
   <div class="ui error message">
-    <div class="header">{{error.message}}</div>
+    <div class="header">We noticed some issues</div>
   </div>
-
-  <div class="ui divider hidden"></div>
-  <div class="ui submit button" on-click="returnToStart">Cancelar</div>
-  <div class="ui submit button primary" on-click="registerNewSyringe">Registrar</div>
 </form>
 {{/partial}}

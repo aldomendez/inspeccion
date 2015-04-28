@@ -4,7 +4,7 @@ var gutil = require('gulp-util');
 var livereload = require('gulp-livereload');
 var wait = require('gulp-wait');
 
-var DEST = '\\\\cymautocert\\osaapp\\epoxy';
+var DEST = '\\\\cymautocert\\osaapp\\inspeccion';
 var BASE = __dirname;
 
 function serverPath (path) {

@@ -5,10 +5,28 @@ include "../inc/database.php";
 $app = new Slim();
 
 $app->get('/', 'index' );
-$app->get('/epoxy/all', 'all_epoxys' );
-$app->post('/epoxy/dispose', 'dispose' );
-$app->post('/epoxy/register', 'register');
+$app->get('/carrier/:carrier', 'get_carrier_content' );
+$app->post('/carrier/dispose', 'dispose' );
+$app->post('/carrier/register', 'register');
 
+
+function get_carrier_content($carrier='')
+{
+    if ($carrier == '') {
+        throw new Exception("No se paso un numero de carrier", 1);
+    }
+    // echo $carrier;
+    $DB = new MxOptix();
+    $DB->setQuery("SELECT carrier_serial_num, carrier_site, serial_num, status FROM phase2.carrier_site@mxoptix WHERE carrier_serial_num = ':carrier'");
+    $DB->bind_vars(':carrier', $carrier);
+    $DB->exec();
+    $json = $DB->json();
+    
+    // Regresa los datos al navegador
+    echo "$json";
+    
+    $DB->close();
+}
 function register()
 {
     global $app;
