@@ -95,7 +95,7 @@
         </div>
       </td>
       <td>
-        <input type="text" value="{{this.COMMENT}}">
+        <input type="text" value="{{this.COMMENTS}}">
       </td>
     </tr>
       {{/each}}

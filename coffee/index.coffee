@@ -15,7 +15,7 @@ r = new Ractive
       "Falta epoxy"
       ]
     step:0
-    userNumber:''
+    userNumber:'10661'
     carrier:'155772978'
     carrierContents:[
       {CARRIER_SITE:1,STATUS:true
@@ -51,16 +51,16 @@ epoxy = do()->
 
     fetchAll:(carrier)->
       r.set 'carrierContents', [
-        {CARRIER_SITE:1,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:2,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:3,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:4,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:5,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:6,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:7,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:8,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:9,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
-        },{CARRIER_SITE:10,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        {CARRIER_SITE:1,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:2,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:3,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:4,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:5,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:6,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:7,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:8,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:9,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
+        },{CARRIER_SITE:10,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla",COMMENTS:''
         }]
 
       addr = "http://cymautocert/osaapp/inspeccion/index.php/carrier/#{carrier}"
@@ -79,24 +79,39 @@ epoxy = do()->
         if user.length > 10 then throw {message:'Numero de usuario demasiado largo', path:'user'}
         if carrier.length isnt 9 then throw {message:'Numero de carrier cambio, Ingresa el carrier de nuevo', path:'carrier'}
         components = components.map (el, i)->
-          if el.STATUS is false
+          if el.STATUS is false or el.COMMENTS isnt ''
+            if el.COMMENTS isnt ''
+              el.COMPONENT = ''
+              el.FAILMODE = ''
             return el
           else
             return null
         components = _.filter components, (el)-> el?
-        console.log components
-        components = components.map (el, i)->
-          if el isnt null
-            if !el.COMPONENT? or el.COMPONENT is "Selecciona un componente" then throw {message:'Debes de seleccionar el componente', path:'component', position:el.CARRIER_SITE }
-            if !el.FAILMODE? or el.FAILMODE is "Selecciona un modo de falla" then throw {message:'Debes de seleccionar un modo de falla', path:'failMode', position:el.CARRIER_SITE }
+        components.map (el, i)->
+          if el isnt null and el.COMMENTS is ''
+            if el.COMPONENT is "Selecciona un componente" then throw {message:'Debes de seleccionar el componente', path:'component', position:el.CARRIER_SITE }
+            if el.FAILMODE is "Selecciona un modo de falla" then throw {message:'Debes de seleccionar un modo de falla', path:'failMode', position:el.CARRIER_SITE }
             
         r.set 'error', undefined
+        console.log components
         return components
       catch e
         console.log e
         r.set 'error', e
         return {error:true}
-    saveFailures:(validatedComponents)->
+    saveFailData:(validatedComponents)->
+      user = r.get 'userNumber'
+      addr = "http://cymautocert/osaapp/inspeccion/index.php/saveFailData"
+      data = {
+        user: user
+        components: validatedComponents
+      }
+      console.log data
+      promise = $.post addr, data
+      promise.done (data)->
+        console.log data
+      return promise
+
 
   }
 
@@ -119,7 +134,9 @@ r.observe 'carrier', (nVal, oVal)->
       loadFetchedIntoR(data)
     
 r.on 'validateAndSave', (e)->
-  epoxy.validate()
+  validatedComponents = epoxy.validate()
+  # console.log validatedComponents
+  epoxy.saveFailData(validatedComponents)
   
 window.epoxy = epoxy
 window.r = r
