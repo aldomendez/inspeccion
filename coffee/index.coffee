@@ -11,6 +11,8 @@ r = new Ractive
       "Contaminado"
       "Fuera de posicion"
       "Exceso de epoxy"
+      "Fracturado"
+      "Falta epoxy"
       ]
     step:0
     userNumber:''
@@ -74,18 +76,23 @@ epoxy = do()->
         if user is '' then throw {message:'Ingresa un NUMERO DE USUARIO', path:'user'}
         if user.length > 10 then throw {message:'Numero de usuario demasiado largo', path:'user'}
         if carrier.length isnt 9 then throw {message:'Numero de carrier cambio, Ingresa el carrier de nuevo', path:'carrier'}
-        cmpt = components.map (el, i)->
+        components = components.map (el, i)->
           if el.STATUS is false
             return el
-        console.log cmpt
+          else
+            return null
+        console.log components
+        components = components.map (el, i)->
+          if el isnt null
+            if !el.COMPONENT? then throw {message:'Debes de seleccionar el componente', path:'component', position:el.CARRIER_SITE }
+            if !el.FAILMODE? then throw {message:'Debes de seleccionar un modo de falla', path:'failMode', position:el.CARRIER_SITE }
             
         r.set 'error', undefined
+        return components
       catch e
         console.log e
         r.set 'error', e
         return {error:true}
-      
-
   }
 
 
@@ -106,7 +113,8 @@ r.observe 'carrier', (nVal, oVal)->
     epoxy.fetchAll(r.get 'carrier').done (data)->
       loadFetchedIntoR(data)
     
-    
+r.on 'validateAndSave', (e)->
+  epoxy.validate()
   
 window.epoxy = epoxy
 window.r = r

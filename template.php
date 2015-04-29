@@ -29,28 +29,26 @@
   <div class="ui error message">
     <div class="header">{{error.message}}</div>
   </div>
-  <div class="two fields">
+  <div class="three fields">
     <div class="required field {{#if error.path == 'user'}}error{{/if}}">
       <label>Numero de usuario</label>
       <div class="field">
         <input type="text" value="{{userNumber}}">
       </div>
     </div>
-    <div class="field">
-      <div class="two fields">
-        <div class="required field">
-          <label>Numero de Carrier</label>
-          <div class="field">
-            <input type="text" value="{{carrier}}">
-          </div>
-        </div>
-        
-        <div class="field">
-          <label>&nbsp;</label>
-          <button class="fluid ui button" on-click="cargarCarrier">Cargar carrier</button>
-        </div>
+
+    <div class="required field">
+      <label>Numero de Carrier</label>
+      <div class="field">
+        <input type="text" value="{{carrier}}">
       </div>
     </div>
+    
+    <div class="field">
+      <label>&nbsp;</label>
+      <button class="fluid ui button" on-click="cargarCarrier">Cargar carrier</button>
+    </div>
+
   </div>
 
 <table class="ui compact celled definition table">
@@ -75,18 +73,26 @@
         <!-- </div> -->
       </td>
       <td>
-        <select class="ui search dropdown {{#if this.STATUS}}disabled{{/if}}" value="{{this.COMPONENT}}">
-          {{#each components}}
-            <option value="{{this}}">{{this}}</option>
-          {{/each}}
-        </select>
+        <div class="ui form  {{#if error}}error{{/if}}">
+          <div class="field {{#if error.path == 'component'}}{{#if error.position == this.CARRIER_SITE}}error{{/if}}{{/if}}">
+            <select value="{{this.COMPONENT}}">
+              {{#each components}}
+                <option value="{{this}}">{{this}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
       </td>
       <td>
-        <select class="ui search dropdown {{#if this.STATUS}}disabled{{/if}}" value="{{this.FAILMODE}}">
-          {{#each failMode}}
-            <option value="{{this}}">{{this}}</option>
-          {{/each}}
-        </select>
+        <div class="ui form  {{#if error}}error{{/if}}">
+          <div class="field {{#if error.path == 'failMode'}}{{#if error.position == this.CARRIER_SITE}}error{{/if}}{{/if}}">
+            <select  value="{{this.FAILMODE}}">
+              {{#each failMode}}
+                <option value="{{this}}">{{this}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
       </td>
       <td>
         <input type="text" value="{{this.COMMENT}}">
@@ -98,7 +104,7 @@
     <tr>
       <th></th>
       <th colspan="6">
-        <div class="ui right floated small green button">
+        <div class="ui right floated small green button" on-click="validateAndSave">
           Guardar
         </div>
       </th>

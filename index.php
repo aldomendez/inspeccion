@@ -8,6 +8,7 @@ $app->get('/', 'index' );
 $app->get('/carrier/:carrier', 'get_carrier_content' );
 $app->post('/carrier/dispose', 'dispose' );
 $app->post('/carrier/register', 'register');
+$app->get('/insp/:carrier/:tech', 'get_4x25CarrierContents');
 
 
 function get_carrier_content($carrier='')
@@ -36,27 +37,13 @@ function register()
     $epoxy['lot'] = $app->request()->post('lot');
     $epoxy['operator'] = $app->request()->post('operator');
     $epoxy['expiration'] = $app->request()->post('expiration');
-    // Estos son datos estaticos que necesito de acuerdo al tipo de geringa que tengo a la mano
-    $data = array(
-        '3410-XTP' => array('sap'=>'1014933','proceso'=>'SI LENS','timeAlive'=>'1','pot_life'=>'240'),
-        '353ND' => array('sap'=>'1028460','proceso'=>'TOSA SHIM','timeAlive'=>'.125','pot_life'=>'150'),
-        '2030SC' => array('sap'=>'1035311','proceso'=>'ROSA SHIM','timeAlive'=>'0.5','pot_life'=>'600'),
-        '3408' => array('sap'=>'1055948','proceso'=>'ALPS LENS','timeAlive'=>'0.333333','pot_life'=>'480')
-    );
-    // obtengo los datos que necesito de los datos estaticos
-    $epoxy['sap'] = $data[$epoxy['type']]['sap'];
-    $epoxy['proceso'] = $data[$epoxy['type']]['proceso'];
-    $epoxy['timeAlive'] = $data[$epoxy['type']]['timeAlive'];
-    $epoxy['pot_life'] = $data[$epoxy['type']]['pot_life'];
-
-    // Query que saca el numero de geringas registradas
-    $queryCount = 'select count(num_sap) qty from  apogee.lr4_epoxy_log@mxapps';
-    // Query que inserta en epoxy
+  
+    // Query que inserta en los componentes
 $queryEpoxyInsert = <<<QUERY1
-INSERT INTO epoxy 
-(lot_number, epoxy_pot_life, expire_date, last_upd_date,COMMENTS)
-Values
-(':type/:lot/:num',':pot_life',SYSDATE+1 ,SYSDATE,':num')
+INSERT INTO fallas_lr4 (
+  serial_num,carrier_serial_num,carrier_site,user_id,comments,componente,fail_mode
+) values
+(:serial_num,:carrier_serial_num,:carrier_site,:user_id,:comments,:componente,:fail_mode)
 QUERY1;
 // Query que inserta en apogee
 $queryInsertEpoxyLog = <<<QUERY2
@@ -148,3 +135,46 @@ function dispose()
 $app->run();
 
 
+
+function get_4x25CarrierContents($carrier, $tech){
+    
+$query = <<<QUERY1
+SELECT CARRIER_SERIAL_NUM, CARRIER_SITE, SERIAL_NUM, 'P' AS Fail_Pass
+  , ':tech' Technician
+  , To_Char(sysdate,'yyyy-mm-dd hh24:mi') upd_date
+FROM carrier_site
+WHERE carrier_serial_num = ':carrier' ORDER BY Carrier_site
+QUERY1;
+
+    $DB = new MxOptix();
+    $DB->setQuery($query);
+    $DB->bind_vars(':carrier', $carrier);
+    $DB->bind_vars(':tech', $tech);
+    oci_execute($DB->statement);
+    $results = null;
+    oci_fetch_all($DB->statement, $results,0,-1,OCI_FETCHSTATEMENT_BY_ROW);
+    
+    // print_r($results);
+
+    $ans = array();
+
+    foreach ($results as $key => $value) {
+        array_push($ans, implode(',', $value));
+    }
+    // // Regresa los datos al navegador
+    echo(implode('|', $ans));
+    
+
+    // $DB->setQuery($query);
+    // $json = $DB->json();
+    
+
+
+
+
+
+
+
+    $DB->close();
+
+}

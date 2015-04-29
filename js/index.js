@@ -6,7 +6,7 @@
     template: '#template',
     data: {
       components: ["Selecciona un componente", "PLC", "ALPS", "GlassRail", "OSA", "Ceramico", "PDArray"],
-      failMode: ['Selecciona un modo de falla', "Desprendido", "Dañado", "Contaminado", "Fuera de posicion", "Exceso de epoxy"],
+      failMode: ['Selecciona un modo de falla', "Desprendido", "Dañado", "Contaminado", "Fuera de posicion", "Exceso de epoxy", "Fracturado", "Falta epoxy"],
       step: 0,
       userNumber: '',
       carrier: '155772978',
@@ -103,7 +103,7 @@
         return promise;
       },
       validate: function() {
-        var carrier, cmpt, components, e, user;
+        var carrier, components, e, user;
         user = r.get('userNumber');
         carrier = r.get('carrier');
         components = r.get('carrierContents');
@@ -126,13 +126,34 @@
               path: 'carrier'
             };
           }
-          cmpt = components.map(function(el, i) {
+          components = components.map(function(el, i) {
             if (el.STATUS === false) {
               return el;
+            } else {
+              return null;
             }
           });
-          console.log(cmpt);
-          return r.set('error', void 0);
+          console.log(components);
+          components = components.map(function(el, i) {
+            if (el !== null) {
+              if (el.COMPONENT == null) {
+                throw {
+                  message: 'Debes de seleccionar el componente',
+                  path: 'component',
+                  position: el.CARRIER_SITE
+                };
+              }
+              if (el.FAILMODE == null) {
+                throw {
+                  message: 'Debes de seleccionar un modo de falla',
+                  path: 'failMode',
+                  position: el.CARRIER_SITE
+                };
+              }
+            }
+          });
+          r.set('error', void 0);
+          return components;
         } catch (_error) {
           e = _error;
           console.log(e);
@@ -167,6 +188,10 @@
         return loadFetchedIntoR(data);
       });
     }
+  });
+
+  r.on('validateAndSave', function(e) {
+    return epoxy.validate();
   });
 
   window.epoxy = epoxy;
