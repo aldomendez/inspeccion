@@ -5,7 +5,7 @@
         Avago
       </a>
       <a class="item">
-        <i class="book icon"></i> Inspecci&oacute;n Visual
+        <i class="checkmark box icon"></i> Inspecci&oacute;n Visual
       </a>
       <!-- <a class="item" on-click="refreshLive"><i class="refresh icon"></i>Refresh</a> -->
       <!-- <div class="right menu">
@@ -64,7 +64,7 @@
   </thead>
   <tbody>
       {{#each carrierContents}}
-    <tr>
+    <tr class="{{#if this.STATUS}}positive{{/if}}{{#if !this.STATUS}}negative{{/if}}">
       <td>{{this.SERIAL_NUM}}</td>
       <td class="collapsing">{{this.CARRIER_SITE}}</td>
       <td class="collapsing">

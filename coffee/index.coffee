@@ -47,18 +47,20 @@ epoxy = do()->
         d.substring(10, 12),
         d.substring(12,14))
 
+
+
     fetchAll:(carrier)->
       r.set 'carrierContents', [
-        {CARRIER_SITE:1,STATUS:true
-        },{CARRIER_SITE:2,STATUS:true
-        },{CARRIER_SITE:3,STATUS:true
-        },{CARRIER_SITE:4,STATUS:true
-        },{CARRIER_SITE:5,STATUS:true
-        },{CARRIER_SITE:6,STATUS:true
-        },{CARRIER_SITE:7,STATUS:true
-        },{CARRIER_SITE:8,STATUS:true
-        },{CARRIER_SITE:9,STATUS:true
-        },{CARRIER_SITE:10,STATUS:true
+        {CARRIER_SITE:1,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:2,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:3,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:4,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:5,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:6,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:7,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:8,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:9,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
+        },{CARRIER_SITE:10,STATUS:true,COMPONENT: "Selecciona un componente",FAILMODE: "Selecciona un modo de falla"
         }]
 
       addr = "http://cymautocert/osaapp/inspeccion/index.php/carrier/#{carrier}"
@@ -81,11 +83,12 @@ epoxy = do()->
             return el
           else
             return null
+        components = _.filter components, (el)-> el?
         console.log components
         components = components.map (el, i)->
           if el isnt null
-            if !el.COMPONENT? then throw {message:'Debes de seleccionar el componente', path:'component', position:el.CARRIER_SITE }
-            if !el.FAILMODE? then throw {message:'Debes de seleccionar un modo de falla', path:'failMode', position:el.CARRIER_SITE }
+            if !el.COMPONENT? or el.COMPONENT is "Selecciona un componente" then throw {message:'Debes de seleccionar el componente', path:'component', position:el.CARRIER_SITE }
+            if !el.FAILMODE? or el.FAILMODE is "Selecciona un modo de falla" then throw {message:'Debes de seleccionar un modo de falla', path:'failMode', position:el.CARRIER_SITE }
             
         r.set 'error', undefined
         return components
@@ -93,6 +96,8 @@ epoxy = do()->
         console.log e
         r.set 'error', e
         return {error:true}
+    saveFailures:(validatedComponents)->
+
   }
 
 

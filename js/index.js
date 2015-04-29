@@ -65,34 +65,54 @@
         r.set('carrierContents', [
           {
             CARRIER_SITE: 1,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 2,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 3,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 4,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 5,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 6,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 7,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 8,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 9,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }, {
             CARRIER_SITE: 10,
-            STATUS: true
+            STATUS: true,
+            COMPONENT: "Selecciona un componente",
+            FAILMODE: "Selecciona un modo de falla"
           }
         ]);
         addr = "http://cymautocert/osaapp/inspeccion/index.php/carrier/" + carrier;
@@ -133,17 +153,20 @@
               return null;
             }
           });
+          components = _.filter(components, function(el) {
+            return el != null;
+          });
           console.log(components);
           components = components.map(function(el, i) {
             if (el !== null) {
-              if (el.COMPONENT == null) {
+              if ((el.COMPONENT == null) || el.COMPONENT === "Selecciona un componente") {
                 throw {
                   message: 'Debes de seleccionar el componente',
                   path: 'component',
                   position: el.CARRIER_SITE
                 };
               }
-              if (el.FAILMODE == null) {
+              if ((el.FAILMODE == null) || el.FAILMODE === "Selecciona un modo de falla") {
                 throw {
                   message: 'Debes de seleccionar un modo de falla',
                   path: 'failMode',
@@ -162,7 +185,8 @@
             error: true
           };
         }
-      }
+      },
+      saveFailures: function(validatedComponents) {}
     };
   })();
 
