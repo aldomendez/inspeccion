@@ -104,7 +104,7 @@
     <tr>
       <th></th>
       <th colspan="6">
-        <div class="ui right floated small green button" on-click="validateAndSave">
+        <div class="ui right floated small {{#if !saved}}green{{/if}} button" on-click="validateAndSave">
           Guardar
         </div>
       </th>

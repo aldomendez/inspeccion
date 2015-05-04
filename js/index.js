@@ -10,6 +10,7 @@
       step: 0,
       userNumber: '10661',
       carrier: '155772978',
+      saved: false,
       carrierContents: [
         {
           CARRIER_SITE: 1,
@@ -219,11 +220,31 @@
   })();
 
   loadFetchedIntoR = function(data) {
+    r.set('saved', false);
     return data.map(function(el, i, array) {
+      var exists, pass_fail;
+      if (/^P/.test(el.STATUS)) {
+        if (el.SAVEDSTATUS != null) {
+          if (el.SAVEDSTATUS === 'P') {
+            pass_fail = true;
+          } else {
+            pass_fail = false;
+          }
+        } else {
+          pass_fail = true;
+        }
+      } else {
+        pass_fail = false;
+      }
+      exists = el.SAVEDSTATUS != null ? true : false;
       r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".CARRIER_SERIAL_NUM", el.CARRIER_SERIAL_NUM);
-      r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".STATUS", /PASS/.test(el.STATUS) ? true : false);
+      r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".STATUS", pass_fail);
       r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".SERIAL_NUM", el.SERIAL_NUM);
-      return r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".CARRIER_SITE", el.CARRIER_SITE);
+      r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".CARRIER_SITE", el.CARRIER_SITE);
+      r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".COMMENTS", el.COMMENTS || '');
+      r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".COMPONENT", el.COMPONENT || 'Selecciona un componente');
+      r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".FAILMODE", el.FAILMODE || 'Selecciona un modo de falla');
+      return r.set("carrierContents." + (el.CARRIER_SITE - 1) + ".exists", exists);
     });
   };
 
@@ -234,18 +255,29 @@
     });
   });
 
+  r.observe('carrierContents.*', function() {
+    return r.set('saved', false);
+  });
+
   r.observe('carrier', function(nVal, oVal) {
     if (nVal.length === 9) {
       return epoxy.fetchAll(r.get('carrier')).done(function(data) {
-        return loadFetchedIntoR(data);
+        loadFetchedIntoR(data);
+        return console.log(r.get('carrierContents'));
       });
     }
   });
 
   r.on('validateAndSave', function(e) {
     var validatedComponents;
-    validatedComponents = epoxy.validate();
-    return epoxy.saveFailData(validatedComponents);
+    if (!r.get('saved')) {
+      validatedComponents = epoxy.validate();
+      console.log(validatedComponents);
+      if ((validatedComponents != null ? validatedComponents.error : void 0) == null) {
+        epoxy.saveFailData(validatedComponents);
+        return r.set('saved', true);
+      }
+    }
   });
 
   window.epoxy = epoxy;

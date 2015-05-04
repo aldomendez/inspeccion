@@ -55,7 +55,7 @@ gulp.task('watch', function () {
   }).on('change', function (event) {
      copyAndReload(event);
   });  
-  gulp.watch(['index.php'], function (event) {
+  gulp.watch(['index.php','start.php'], function (event) {
   }).on('change', function (event) {
      copy(event);
   });  

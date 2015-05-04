@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <title>Epoxy</title>
+  <title>Inspeccion</title>
   <link rel="stylesheet" type="text/css"  href="../jsLib/SemanticUi/1.11.6/semantic.css">
   <link rel="stylesheet" type="text/css"  href="../jsLib/nprogress/1.1.6/nprogress.css">
 </head>

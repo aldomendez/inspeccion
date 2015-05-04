@@ -17,6 +17,7 @@ r = new Ractive
     step:0
     userNumber:'10661'
     carrier:'155772978'
+    saved:false
     carrierContents:[
       {CARRIER_SITE:1,STATUS:true
       },{CARRIER_SITE:2,STATUS:true
@@ -117,26 +118,50 @@ epoxy = do()->
 
 
 loadFetchedIntoR = (data)->
+  r.set 'saved', false
   data.map (el, i, array)->
+    if /^P/.test(el.STATUS) 
+      if el.SAVEDSTATUS?
+        if el.SAVEDSTATUS is 'P'
+          pass_fail = true
+        else
+          pass_fail = false
+      else
+        pass_fail = true
+    else
+      pass_fail = false
+    exists = if el.SAVEDSTATUS? then true else false
     r.set "carrierContents.#{el.CARRIER_SITE-1}.CARRIER_SERIAL_NUM",  el.CARRIER_SERIAL_NUM
-    r.set "carrierContents.#{el.CARRIER_SITE-1}.STATUS",              if /PASS/.test(el.STATUS) then true else false
+    r.set "carrierContents.#{el.CARRIER_SITE-1}.STATUS",              pass_fail
     r.set "carrierContents.#{el.CARRIER_SITE-1}.SERIAL_NUM",          el.SERIAL_NUM
     r.set "carrierContents.#{el.CARRIER_SITE-1}.CARRIER_SITE",        el.CARRIER_SITE
+    r.set "carrierContents.#{el.CARRIER_SITE-1}.COMMENTS",            el.COMMENTS || ''
+    r.set "carrierContents.#{el.CARRIER_SITE-1}.COMPONENT",           el.COMPONENT || 'Selecciona un componente'
+    r.set "carrierContents.#{el.CARRIER_SITE-1}.FAILMODE",            el.FAILMODE || 'Selecciona un modo de falla'
+    r.set "carrierContents.#{el.CARRIER_SITE-1}.exists",              exists
 
 r.on 'cargarCarrier', (e)->
   e.original.preventDefault()
   epoxy.fetchAll(r.get 'carrier').done (data)->
     loadFetchedIntoR(data)
 
+r.observe 'carrierContents.*', ()->
+  r.set 'saved', false
+
 r.observe 'carrier', (nVal, oVal)->
   if nVal.length is 9
     epoxy.fetchAll(r.get 'carrier').done (data)->
       loadFetchedIntoR(data)
+      console.log r.get 'carrierContents'
     
 r.on 'validateAndSave', (e)->
-  validatedComponents = epoxy.validate()
-  # console.log validatedComponents
-  epoxy.saveFailData(validatedComponents)
+  if !r.get 'saved'
+    validatedComponents = epoxy.validate()
+    console.log validatedComponents
+    if !validatedComponents?.error?
+      epoxy.saveFailData(validatedComponents)
+      r.set 'saved', true
+
   
 window.epoxy = epoxy
 window.r = r
