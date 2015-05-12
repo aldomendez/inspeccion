@@ -65,6 +65,16 @@ FROM dual
 WHERE NOT EXISTS (SELECT 1 FROM fallas_lr4 WHERE serial_num = ':serial_num')
 QUERY1;
 
+$update_fail_mode = <<<QUERY1
+UPDATE fallas_lr4 
+SET
+    user_id = ':user_id',
+    status = ':status',
+    component = ':component',
+    failmode = ':failmode',
+    comments = ':comments'
+Where serial_num = ':serial_num'
+QUERY1;
 
     $DB = new MxApps();
 
@@ -75,6 +85,18 @@ QUERY1;
             $DB->bind_vars(':status',$value['STATUS']=='true'?'P':'F');
             $DB->bind_vars(':carrier_serial_num',$value['CARRIER_SERIAL_NUM']);
             $DB->bind_vars(':carrier_site',$value['CARRIER_SITE']);
+            $DB->bind_vars(':user_id',$user);
+            $DB->bind_vars(':comments',$value['COMMENTS']);
+            $DB->bind_vars(':component',$value['COMPONENT']);
+            $DB->bind_vars(':failmode',$value['FAILMODE']);
+            
+            echo $DB->query . PHP_EOL;
+            $DB->insert();
+            oci_free_statement($DB->statement);
+        } else {
+            $DB->setQuery($update_fail_mode);
+            $DB->bind_vars(':serial_num',$value['SERIAL_NUM']);
+            $DB->bind_vars(':status',$value['STATUS']=='true'?'P':'F');
             $DB->bind_vars(':user_id',$user);
             $DB->bind_vars(':comments',$value['COMMENTS']);
             $DB->bind_vars(':component',$value['COMPONENT']);

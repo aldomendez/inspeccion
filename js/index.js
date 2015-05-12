@@ -5,11 +5,11 @@
     el: 'container',
     template: '#template',
     data: {
-      components: ["Selecciona un componente", "PLC", "ALPS", "GlassRail", "OSA", "Ceramico", "PDArray"],
+      components: ["Selecciona un componente", "PLC", "ALPS", "GlassRail", "OSA", "Ceramico", "PDArray", "Laser", "Pin"],
       failMode: ['Selecciona un modo de falla', "Desprendido", "Dañado", "Contaminado", "Fuera de posicion", "Exceso de epoxy", "Fracturado", "Falta epoxy"],
       step: 0,
-      userNumber: '10661',
-      carrier: '155772978',
+      userNumber: '',
+      carrier: '',
       saved: false,
       carrierContents: [
         {
