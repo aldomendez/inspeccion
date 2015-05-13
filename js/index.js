@@ -10,7 +10,7 @@
       step: 0,
       userNumber: '',
       carrier: '',
-      saved: false,
+      saved: true,
       carrierContents: [
         {
           CARRIER_SITE: 1,
@@ -159,7 +159,7 @@
           }
           components = components.map(function(el, i) {
             if (el.STATUS === false || el.COMMENTS !== '') {
-              if (el.COMMENTS !== '') {
+              if (el.COMMENTS !== '' && el.STATUS === true) {
                 el.COMPONENT = '';
                 el.FAILMODE = '';
               }

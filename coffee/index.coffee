@@ -17,7 +17,7 @@ r = new Ractive
     step:0
     userNumber:''
     carrier:''
-    saved:false
+    saved:true
     carrierContents:[
       {CARRIER_SITE:1,STATUS:true
       },{CARRIER_SITE:2,STATUS:true
@@ -81,7 +81,7 @@ epoxy = do()->
         if carrier.length isnt 9 then throw {message:'Numero de carrier cambio, Ingresa el carrier de nuevo', path:'carrier'}
         components = components.map (el, i)->
           if el.STATUS is false or el.COMMENTS isnt ''
-            if el.COMMENTS isnt ''
+            if el.COMMENTS isnt '' and el.STATUS is true
               el.COMPONENT = ''
               el.FAILMODE = ''
             return el
