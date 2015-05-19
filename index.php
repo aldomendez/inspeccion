@@ -76,7 +76,15 @@ SET
 Where serial_num = ':serial_num'
 QUERY1;
 
+$update_part_info = <<<Query2
+UPDATE part_info
+SET part_status = ':status',
+pass_fail = ':pass_fail'
+WHERE serial_num = ':serial_num'
+Query2;
+
     $DB = new MxApps();
+    $P2 = new MxOptix();
 
     foreach ($components as $key => $value) {
         if ($value['exists'] == 'false') {
@@ -93,6 +101,15 @@ QUERY1;
             echo $DB->query . PHP_EOL;
             $DB->insert();
             oci_free_statement($DB->statement);
+
+            $P2->setQuery($update_part_info);
+            $P2->bind_vars(':serial_num',$value['SERIAL_NUM']);
+            $P2->bind_vars(':status',$value['STATUS']=='true'?'PASS/POST-PURGE':'FAIL/VISUAL_INSPECTION');
+            $P2->bind_vars(':pass_fail',$value['STATUS']=='true'?'P':'F');
+            
+            echo $P2->query . PHP_EOL;
+            $P2->insert();
+            oci_free_statement($P2->statement);
         } else {
             $DB->setQuery($update_fail_mode);
             $DB->bind_vars(':serial_num',$value['SERIAL_NUM']);
@@ -105,9 +122,20 @@ QUERY1;
             echo $DB->query . PHP_EOL;
             $DB->insert();
             oci_free_statement($DB->statement);
+
+            
+            $P2->setQuery($update_part_info);
+            $P2->bind_vars(':serial_num',$value['SERIAL_NUM']);
+            $P2->bind_vars(':status',$value['STATUS']=='true'?'PASS/POST-PURGE':'FAIL/VISUAL_INSPECTION');
+            $P2->bind_vars(':pass_fail',$value['STATUS']=='true'?'P':'F');
+            
+            echo $P2->query . PHP_EOL;
+            $P2->insert();
+            oci_free_statement($P2->statement);
         }
     }
     oci_close($DB->conn);
+    oci_close($P2->conn);
 }
 
 function index()
@@ -127,6 +155,39 @@ function all_epoxys(){
     
     $DB->close();
 }
+
+
+function get_4x25CarrierContents($carrier, $tech){
+
+    $query = <<<QUERY1
+SELECT CARRIER_SERIAL_NUM, CARRIER_SITE, SERIAL_NUM, 'P' AS Fail_Pass
+, ':tech' Technician
+, To_Char(sysdate,'yyyy-mm-dd hh24:mi') upd_date
+FROM carrier_site
+WHERE carrier_serial_num = ':carrier' ORDER BY Carrier_site
+QUERY1;
+
+    $DB = new MxOptix();
+    $DB->setQuery($query);
+    $DB->bind_vars(':carrier', $carrier);
+    $DB->bind_vars(':tech', $tech);
+    oci_execute($DB->statement);
+    $results = null;
+    oci_fetch_all($DB->statement, $results,0,-1,OCI_FETCHSTATEMENT_BY_ROW);
+
+    // print_r($results);
+
+    $ans = array();
+
+    foreach ($results as $key => $value) {
+            array_push($ans, implode(',', $value));
+    }
+    // // Regresa los datos al navegador
+    echo(implode('|', $ans));
+
+    $DB->close();
+ 
+ } 
 
 
 $app->run();

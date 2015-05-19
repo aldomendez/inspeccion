@@ -120,6 +120,8 @@ epoxy = do()->
 loadFetchedIntoR = (data)->
   r.set 'saved', false
   data.map (el, i, array)->
+    # De esta manera verifico el estatus de las piezas
+    # Tiene mas relevancia el SAVEDSTATUS que el STATUS
     if /^P/.test(el.STATUS) 
       if el.SAVEDSTATUS?
         if el.SAVEDSTATUS is 'P'
