@@ -4,7 +4,7 @@ var gutil = require('gulp-util');
 var livereload = require('gulp-livereload');
 var wait = require('gulp-wait');
 
-var DEST = '\\\\cymautocert\\osaapp\\inspeccion';
+var DEST = '\\\\wmatvmlr401\\htdocs\\lr4\\check_osas';
 var BASE = __dirname;
 
 function serverPath (path) {
@@ -25,7 +25,8 @@ copyAndReload = function copyAndReload (event) {
 copy = function copyAndReload (event) {
   console.log('Sended to: ',serverPath(event.path));
   gulp.src(event.path)
-       .pipe(gulp.dest(DEST + serverPath(event.path)));
+       .pipe(gulp.dest(DEST + serverPath(event.path)))
+       .pipe(livereload(0));
 }
 
 compileAndPush = function compileAndPush (event) {

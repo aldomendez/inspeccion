@@ -5,7 +5,7 @@ include "../inc/database.php";
 $app = new Slim();
 
 $app->get('/', 'index' );
-$app->get('/carrier/:carrier', 'get_carrier_content' );
+$app->get('/getCarrierSerials/:carrier', 'get_carrier_content' );
 $app->post('/carrier/dispose', 'dispose' );
 $app->post('/saveFailData', 'saveFailData');
 $app->get('/insp/:carrier/:tech', 'get_4x25CarrierContents');
@@ -18,23 +18,7 @@ function get_carrier_content($carrier='')
     }
     // echo $carrier;
     $DB = new MxOptix();
-    $query = <<<QUERY1
-SELECT DISTINCT 
-a.CARRIER_SERIAL_NUM,
-a.CARRIER_SITE,
-a.SERIAL_NUM,
-a.STATUS,
-b.STATUS savedStatus,
-b.COMMENTS,
-b.component,
-b.failmode
-           
-FROM phase2.carrier_site@mxoptix a 
-,apogee.fallas_lr4@mxapps b
-WHERE a.serial_num = b.serial_num (+)
-AND a.carrier_serial_num = ':carrier'       
-ORDER BY a.carrier_site
-QUERY1;
+    $query = file_get_contents("sql/select_serials_in_pack.sql");
     $DB->setQuery($query);
     $DB->bind_vars(':carrier', $carrier);
     $DB->exec();
