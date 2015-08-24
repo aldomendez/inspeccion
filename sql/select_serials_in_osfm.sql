@@ -6,4 +6,4 @@ select
 from
   apps.xxbi_cyp_onhand_inv_v@osfm
 where
-  job =':serial'
+  job in (:serials)

@@ -6,6 +6,7 @@ $app = new Slim();
 
 $app->get('/', 'index' );
 $app->get('/getCarrierSerials/:carrier', 'get_carrier_content' );
+$app->get('/osfm/:carriers', 'get_osfm_job_data_for_carrier' );
 $app->post('/carrier/dispose', 'dispose' );
 $app->post('/saveFailData', 'saveFailData');
 $app->get('/insp/:carrier/:tech', 'get_4x25CarrierContents');
@@ -21,6 +22,25 @@ function get_carrier_content($carrier='')
     $query = file_get_contents("sql/select_serials_in_pack.sql");
     $DB->setQuery($query);
     $DB->bind_vars(':carrier', $carrier);
+    $DB->exec();
+    $json = $DB->json();
+    
+    // Regresa los datos al navegador
+    echo "$json";
+    
+    $DB->close();
+}
+
+function get_osfm_job_data_for_carrier($carrier='')
+{
+    if ($carrier == '') {
+        throw new Exception("No se paso un numero de carrier", 1);
+    }
+    // echo $carrier;
+    $DB = new MxOptix();
+    $query = file_get_contents("sql/select_serials_in_osfm.sql");
+    $DB->setQuery($query);
+    $DB->bind_vars(':serials', $carrier);
     $DB->exec();
     $json = $DB->json();
     

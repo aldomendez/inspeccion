@@ -9,26 +9,51 @@
 
   util.packId = Vue.resource('http://wmatvmlr401/lr4/check_osas/index.php/getCarrierSerials/:pack');
 
+  util.osfmData = Vue.resource('http://wmatvmlr401/lr4/check_osas/index.php/osfm/:serials');
+
   Pack = (function() {
     function Pack(carrier1) {
       this.carrier = carrier1;
       this.contents = [];
-      this.status = 'Buscando los datos del Pack';
+      this.serials = [];
+      this.status = '';
       this.fetchCarrierContent();
     }
 
     Pack.prototype.fetchCarrierContent = function() {
+      this.status = ': Buscando los datos del Pack';
       return util.packId.get({
         pack: this.carrier
       }, (function(_this) {
         return function(data) {
-          var i, j, len, results;
-          results = [];
+          var i, j, len;
           for (j = 0, len = data.length; j < len; j++) {
             i = data[j];
-            results.push(_this.contents.push([i.CARRIER_SITE, i.SERIAL_NUM, i.STATUS]));
+            _this.serials.push(i.SERIAL_NUM);
+            _this.contents.push([i.CARRIER_SITE, i.SERIAL_NUM, i.STATUS]);
           }
-          return results;
+          return _this.fetchDataFromOSFM();
+        };
+      })(this));
+    };
+
+    Pack.prototype.fetchDataFromOSFM = function() {
+      this.status = ': Buscando los datos en OSFM...';
+      return util.osfmData.get({
+        serials: "'" + (this.serials.join("','")) + "'"
+      }, (function(_this) {
+        return function(data) {
+          data.forEach(function(osfmEl, i) {
+            return _this.contents.some(function(contEl, i) {
+              if (osfmEl.JOB === contEl[1]) {
+                contEl.push(osfmEl.ITEM);
+                contEl.push(osfmEl.SUBINVENTORY_CODE);
+                contEl.push(osfmEl.AGED_DAYS);
+                return true;
+              }
+            });
+          });
+          return _this.status = '';
         };
       })(this));
     };
@@ -40,15 +65,7 @@
   window.vm = new Vue({
     el: '#template',
     data: {
-      carriers: [
-        {
-          carrier: '156181394',
-          contents: [['1', '159866954', 'PASS/POST-PURGE', '159866954', 'MSPP-PIC', '5067-5071', '0'], ['2', '159866954', 'PASS/POST-PURGE', '159866954', 'MSPP-PIC', '5067-5071', '4'], ['3', '159866954', 'PASS/POST-PURGE', '159866954', 'MSPP-PIC', '5067-5071', '3'], ['4', '159866954', 'PASS/POST-PURGE', '159866954', 'MSPP-PIC', '5067-5071', '0']]
-        }, {
-          carrier: '156181394',
-          contents: [['1', '156179044', 'PASS/POST-PURGE', '156179044', 'MSPP-PIC', '5067-5071', '0'], ['2', '156179044', 'PASS/POST-PURGE', '156179044', 'MSPP-PIC', '5067-5071', '4'], ['3', '156179044', 'PASS/POST-PURGE', '156179044', 'MSPP-PIC', '5067-5071', '3'], ['4', '156179044', 'PASS/POST-PURGE', '156179044', 'MSPP-PIC', '5067-5071', '0']]
-        }
-      ],
+      carriers: [],
       selectedpack: 0,
       newPackCarrier: '156269132'
     },

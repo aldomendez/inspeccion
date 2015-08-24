@@ -51,7 +51,7 @@
           <table class="ui compact small celled striped table">
             <thead>
               <tr><th colspan="7">
-                Piezas en el pack
+                Piezas en el pack {{carriers[selectedpack].status}} 
               </th>
             </tr></thead><tbody>
               <tr v-repeat="device in carriers[selectedpack].contents">
@@ -72,7 +72,7 @@
           </table>
 
           <div class="ui fuid text menu">
-            <a href="#" class="item"><i class="flag icon"></i> Report</a>
+            <a href="#" class="item"><i class="red flag icon"></i> Report</a>
             <a href="#" class="item"><i class="refresh icon"></i> Reload from database</a>
             <a href="#" class="item"><i class="cloud download icon"></i> Update from OSFM</a>
             <!-- <a href="#" class="item"><i class="warning icon"></i> Warning</a> -->
