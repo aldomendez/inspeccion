@@ -30,7 +30,7 @@ class Pack
     @status = 0
     util.packId.get {pack:@carrier}, (data)=>
       for i in data
-        @serials.push i.SERIAL_NUM
+        if i.ACTUAL_STATUS is 'noOsfmData' then @serials.push i.SERIAL_NUM
         @contents.push [i.CARRIER_SITE, i.SERIAL_NUM, i.STATUS]
       @fetchDataFromOSFM()
     .error (data, status, request)->
@@ -41,6 +41,8 @@ class Pack
     util.osfmData.get {serials:"'#{@serials.join "','"}'"}, (data)=>
       @gen = util.generations[data[0].ITEM].gen || '--'
       data.forEach (osfmEl, i)=>
+        # utilizo `some` por que quiero que retorne tan pronto como encuentre 
+        # un resultado, en vez de recorrer todos los registros
         @contents.some (contEl, i)=>
           if osfmEl.JOB is contEl[1]
             contEl.push osfmEl.ITEM

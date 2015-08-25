@@ -4,7 +4,7 @@ Select
   serial_num,
   Status
 from
-  carrier_site
+  phase2.carrier_site@mxoptix
 where
   carrier_serial_num =':carrier'
 order by carrier_site

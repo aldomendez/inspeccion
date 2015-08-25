@@ -41,7 +41,9 @@
           var i, j, len;
           for (j = 0, len = data.length; j < len; j++) {
             i = data[j];
-            _this.serials.push(i.SERIAL_NUM);
+            if (i.ACTUAL_STATUS === 'noOsfmData') {
+              _this.serials.push(i.SERIAL_NUM);
+            }
             _this.contents.push([i.CARRIER_SITE, i.SERIAL_NUM, i.STATUS]);
           }
           return _this.fetchDataFromOSFM();

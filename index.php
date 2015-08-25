@@ -6,7 +6,9 @@ $app = new Slim();
 
 $app->get('/', 'index' );
 $app->get('/getCarrierSerials/:carrier', 'get_carrier_content' );
-$app->get('/osfm/:carriers', 'get_osfm_job_data_for_carrier' );
+$app->get('/osfm/:serials', 'get_osfm_job_data_for_carrier' );
+$app->get('/flag/:carrier', 'get_osfm_job_data_for_carrier' );
+$app->get('/markUsed/:carrier', 'get_osfm_job_data_for_carrier' );
 // $app->post('/carrier/dispose', 'dispose' );
 // $app->post('/saveFailData', 'saveFailData');
 // $app->get('/insp/:carrier/:tech', 'get_4x25CarrierContents');
@@ -19,36 +21,78 @@ function get_carrier_content($carrier='')
     if ($carrier == '') {
         throw new Exception("No se paso un numero de carrier", 1);
     }
-    // echo $carrier;
-    $DB = new MxOptix();
-    $query = file_get_contents("sql/select_serials_in_pack.sql");
+    // Busca que si tiene registros previos
+    $DB = new MxApps();
+    $query = file_get_contents("sql/select_inventario.sql");
     $DB->setQuery($query);
-    $DB->bind_vars(':carrier', $carrier);
+    $DB->bind_vars(':carrier_serial_num', $carrier);
     $DB->exec();
     $json = $DB->json();
+    if (sizeof($DB->results) > 0) {
+        // Regresa los datos al navegador
+        echo "$json";
+    } else {
     
-    // Regresa los datos al navegador
-    echo "$json";
-    
+        $query = file_get_contents("sql/select_serials_in_pack.sql");
+        $DB->setQuery($query);
+        $DB->bind_vars(':carrier', $carrier);
+        $DB->exec();
+        
+        $query = file_get_contents("sql/insert_inventario.sql");
+        foreach ($DB->results as $key => $value) {
+            // print_r($value);
+            $DB->setQuery($query);
+            $DB->bind_vars(':carrier_site',$value['CARRIER_SITE']);
+            $DB->bind_vars(':serial_num',$value['SERIAL_NUM']);
+            $DB->bind_vars(':carrier_serial_num',$value['CARRIER_SERIAL_NUM']);
+            $DB->bind_vars(':status','noOsfmData');
+            $DB->bind_vars(':db_status',$value['STATUS']);
+            // echo $DB->query;
+            $DB->insert();
+        }
+
+        // Return results
+        $json = $DB->json();
+        echo "$json";
+    }
     $DB->close();
 }
 
-function get_osfm_job_data_for_carrier($carrier='')
+function get_osfm_job_data_for_carrier($serials='')
 {
-    if ($carrier == '') {
-        throw new Exception("No se paso un numero de carrier", 1);
+    if ($serials == '') {
+        throw new Exception("No se paso uno o varios NUMEROS DE SERIE entre comillas sencillas, separados por comas", 1);
     }
-    // echo $carrier;
-    $DB = new MxOptix();
+    // echo $serials;
+    $DB = new MxApps();
+
+    // 
     $query = file_get_contents("sql/select_serials_in_osfm.sql");
     $DB->setQuery($query);
-    $DB->bind_vars(':serials', $carrier);
+    $DB->bind_vars(':serials', $serials);
     $DB->exec();
     $json = $DB->json();
-    
+    // echo "$json";
+
+    if (sizeof($DB->results) > 0) {
+
+        $query = file_get_contents("sql/update_inventario.sql");
+        foreach ($DB->results as $key => $value) {
+            // print_r($value);
+            $DB->setQuery($query);
+            $DB->bind_vars(':date_received',$value['DATE_RECEIVED']);
+            $DB->bind_vars(':osfm_item',$value['ITEM']);
+            $DB->bind_vars(':comments','');
+            $DB->bind_vars(':status','inReview');
+            $DB->bind_vars(':serial_num',$value['JOB']);
+            // echo $DB->query;
+            $DB->insert();
+        }
+    }
+
     // Regresa los datos al navegador
+    // $json = $DB->json();
     echo "$json";
-    
     $DB->close();
 }
 

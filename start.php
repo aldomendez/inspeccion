@@ -78,20 +78,19 @@
                 </td>
               </tr>
             </tbody>
-            <tfoot class="full-width">
-              
-            <tr>
+
+            <!-- <tfoot class="full-width"><tr>
               <th colspan="7">
                 <div class="ui small icon button">Gen2</div>
                 <div class="ui small icon button">Gen3</div>                
               </th>
-            </tr></tfoot>
+            </tr></tfoot> -->
           </table>
 
           <div class="ui fuid text menu">
-            <a href="#" class="item"><i class="red flag icon"></i> Report</a>
+            <!-- <a href="#" class="item"><i class="red flag icon"></i> Report</a>
             <a href="#" class="item"><i class="refresh icon"></i> Reload from database</a>
-            <a href="#" class="item"><i class="cloud download icon"></i> Update from OSFM</a>
+            <a href="#" class="item"><i class="cloud download icon"></i> Update from OSFM</a> -->
             <!-- <a href="#" class="item"><i class="warning icon"></i> Warning</a> -->
           </div>
 

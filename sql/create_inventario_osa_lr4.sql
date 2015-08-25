@@ -1,5 +1,6 @@
 CREATE TABLE inventario_osa_lr4 (
- date_recived DATE NOT NULL,
+ id NUMBER(9) NOT NULL,
+ date_received DATE NOT NULL,
  date_added DATE DEFAULT (SYSDATE),
  carrier_site NUMBER(2),
  serial_num NUMBER(9),
