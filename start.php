@@ -37,7 +37,7 @@
             <a class="item" v-repeat="carrier in carriers"
                 v-on="click:selectCarrier($index)"
                 v-class="active:$index === selectedpack, blue:$index === selectedpack">
-              {{carrier.carrier}}
+              {{carrier.carrier}}:{{carrier.gen}}
               <div class="ui label" v-class="blue: $index === selectedpack">
                 {{carrier.contents.length}}
               </div>
@@ -50,10 +50,19 @@
       
           <table class="ui compact small celled striped table">
             <thead>
-              <tr><th colspan="7">
-                Piezas en el pack {{carriers[selectedpack].status}} 
-              </th>
-            </tr></thead><tbody>
+              <tr>
+                <th colspan="7">Piezas en el pack {{carriers[selectedpack].status}}</th>
+              </tr>
+              <tr v-if="showHeader">
+                <th>#</th>
+                <th>Serial</th>
+                <th>Estado</th>
+                <th>Codigo</th>
+                <th>Locaci&oacute;n</th>
+                <th>Antiguedad</th>
+                <th>Recibido</th>
+              </tr>
+            </thead><tbody>
               <tr v-repeat="device in carriers[selectedpack].contents">
                 <td class="collapsing">{{device[0]}}</td>
                 <td>{{device[1]}}</td>
@@ -69,6 +78,14 @@
                 </td>
               </tr>
             </tbody>
+            <tfoot class="full-width">
+              
+            <tr>
+              <th colspan="7">
+                <div class="ui small icon button">Gen2</div>
+                <div class="ui small icon button">Gen3</div>                
+              </th>
+            </tr></tfoot>
           </table>
 
           <div class="ui fuid text menu">
