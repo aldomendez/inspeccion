@@ -6,6 +6,7 @@ insert INTO inventario_osa_lr4
  status,
  db_status,
  osfm_item,
+ osfm_location,
  comments) 
 VALUES
 (sysdate,
@@ -14,6 +15,7 @@ VALUES
   ':carrier_serial_num',
   ':status',
   ':db_status',
+  ':osfm_location',
   '',
   ''
 )

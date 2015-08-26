@@ -7,7 +7,7 @@ $app = new Slim();
 $app->get('/', 'index' );
 $app->get('/getCarrierSerials/:carrier', 'get_carrier_content' );
 $app->get('/osfm/:serials', 'get_osfm_job_data_for_carrier' );
-$app->get('/flag/:carrier', 'get_osfm_job_data_for_carrier' );
+$app->get('/flag/:carrier', 'report_a_carrier' );
 $app->get('/markUsed/:carrier', 'get_osfm_job_data_for_carrier' );
 // $app->post('/carrier/dispose', 'dispose' );
 // $app->post('/saveFailData', 'saveFailData');
@@ -46,6 +46,7 @@ function get_carrier_content($carrier='')
             $DB->bind_vars(':serial_num',$value['SERIAL_NUM']);
             $DB->bind_vars(':carrier_serial_num',$value['CARRIER_SERIAL_NUM']);
             $DB->bind_vars(':status','noOsfmData');
+            $DB->bind_vars(':osfm_location','');
             $DB->bind_vars(':db_status',$value['STATUS']);
             // echo $DB->query;
             $DB->insert();
@@ -66,7 +67,6 @@ function get_osfm_job_data_for_carrier($serials='')
     // echo $serials;
     $DB = new MxApps();
 
-    // 
     $query = file_get_contents("sql/select_serials_in_osfm.sql");
     $DB->setQuery($query);
     $DB->bind_vars(':serials', $serials);
@@ -84,6 +84,7 @@ function get_osfm_job_data_for_carrier($serials='')
             $DB->bind_vars(':osfm_item',$value['ITEM']);
             $DB->bind_vars(':comments','');
             $DB->bind_vars(':status','inReview');
+            $DB->bind_vars(':osfm_location',$value['SUBINVENTORY_CODE']);
             $DB->bind_vars(':serial_num',$value['JOB']);
             // echo $DB->query;
             $DB->insert();
@@ -101,6 +102,17 @@ function index()
     include "start.php";
 }
 
+function report_a_carrier($serial)
+{
+    $DB = new MxApps();
+
+    $query = file_get_contents("sql/update_inventario_flaged.sql");
+    $DB->setQuery($query);
+    $DB->bind_vars(':actual_status', 'problem_detected');
+    $DB->bind_vars(':serial', $serial);
+    $DB->exec();
+    echo "[true]";
+}
 // function saveFailData()
 // {
 //     global $app;
