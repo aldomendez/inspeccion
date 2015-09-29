@@ -52,6 +52,7 @@
             <a href="#" class="item" v-on="click:markAsOk"><i class="green checkmark icon"></i> Esta bien</a>
             <a href="#" class="item" v-on="click:reportPack"><i class="red flag icon"></i> Reportar</a>
             <a href="#" class="item"><i class="archive icon"></i> Marcar como consumida</a>
+            <a href="#" class="item" v-on="click:removeFromList"><i class="remove circle icon"></i> Quitar de la lista</a>
             <!-- <a href="#" class="item"><i class="cloud download icon"></i> Update from OSFM</a> -->
             <!-- <a href="#" class="item"><i class="warning icon"></i> Warning</a> -->
           </div>
@@ -68,7 +69,8 @@
                 <th>Estado</th>
                 <th>Codigo</th>
                 <th>Locaci&oacute;n</th>
-                <th>Antiguedad</th>
+                <th>Comentario</th>
+                <!-- <th>Antiguedad</th> -->
                 <th>Recibido</th>
               </tr>
             </thead><tbody>
@@ -80,11 +82,27 @@
                   </div>
                 </td>
                 <td class="collapsing">{{device.carrier_site}}</td>
-                <td>{{device.serial_num}}</td>
+                <td>
+                <i class="icon gray cloud" v-show="device.sysStatus=='noOsfmData'"></i>
+                <i class="icon unhide teal" v-show="device.sysStatus=='inReview'"></i>
+                <i class="icon flag red" v-show="device.sysStatus=='REJECTED'"></i>
+                <i class="icon blue check circle" v-show="device.sysStatus=='ACCEPTED'"></i>
+                <i class="icon green checkmark box" v-show="device.sysStatus=='CONSUMED'"></i>
+                <i class="icon gray trash outline" v-show="device.sysStatus=='SCRAP'"></i>
+                <i class="icon black trash " v-show="device.sysStatus=='SCRAPED'"></i>
+                {{device.serial_num}}</td>
                 <td class="">{{device.status}}</td>
                 <td class="">{{device.item}}</td>
                 <td class="">{{device.osfm_location}}</td>
-                <td class="">{{device.aged_days}}</td>
+                <td class="">
+                  <div class="ui action small input">
+                    <input type="text" placeholder="Search..." v-model="device.comment">
+                    <button class="ui icon button">
+                      <i class="save icon"></i>
+                    </button>
+                  </div>
+                </td>
+                <!-- <td class="">{{device.aged_days}}</td> -->
                 <td class="right aligned collapsing">{{device.date_received}}</td>
               </tr>
               <tr v-if="carriers[selectedpack].contents.length == 0">
@@ -101,10 +119,48 @@
               </th>
             </tr></tfoot> -->
           </table>
-
-
-
+          <div class="ui grid segment two column row">
+            <div class="column">
+              
+              <div class="ui list">
+                <div class="item">
+                  <i class="icon gray cloud"></i>
+                  <div class="content">No se han cargado datos de OSFM ( o no tiene)</div>
+                </div>
+                <div class="item">
+                  <i class="icon blue check circle"></i>
+                  <div class="content">Pack listo para ingresar a los equipos</div>
+                </div>
+                <div class="item">
+                  <i class="icon green checkmark box"></i>
+                  <div class="content">Ya fue consumida por los equipos</div>
+                </div>
+                <div class="item">
+                  <i class="icon black trash"></i>
+                  <div class="content">Ya fue escrapeada</div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="ui list">
+                <div class="item">
+                  <i class="icon unhide teal"></i>
+                  <div class="content">Esta en espera de que un humano revise la informacion</div>
+                </div>
+                <div class="item">
+                  <i class="icon flag red"></i>
+                  <div class="content">El pack fue rechazado, por alguna discrepancia</div>
+                </div>
+                <div class="item">
+                  <i class="icon gray trash outline"></i>
+                  <div class="content">Esta pendiente de ser escrapeada</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+
       </div>
 
 

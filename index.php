@@ -21,7 +21,7 @@ function get_carrier_content($carrier='')
     if ($carrier == '') {
         throw new Exception("No se paso un numero de carrier", 1);
     }
-    // Busca que si tiene registros previos
+    // Busca si tiene registros previos
     $DB = new MxApps();
     $query = file_get_contents("sql/select_inventario.sql");
     $DB->setQuery($query);
@@ -102,16 +102,17 @@ function index()
     include "start.php";
 }
 
-function report_a_carrier($serial)
+function report_a_carrier($carrier)
 {
     $DB = new MxApps();
-
     $query = file_get_contents("sql/update_inventario_flaged.sql");
     $DB->setQuery($query);
-    $DB->bind_vars(':actual_status', 'problem_detected');
-    $DB->bind_vars(':serial', $serial);
+    $DB->bind_vars(':actual_status', 'REJECTED');
+    $DB->bind_vars(':carrier', $carrier);
+    echo $DB->query;
     $DB->exec();
     echo "[true]";
+    $DB->close();
 }
 // function saveFailData()
 // {

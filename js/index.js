@@ -71,13 +71,15 @@
             _this.contents.push({
               'carrier_site': i.CARRIER_SITE,
               'serial_num': i.SERIAL_NUM,
-              'status': i.STATUS,
+              'status': i.DB_STATUS,
               'item': i.ITEM,
               'osfm_location': i.OSFM_LOCATION,
               'aged_days': i.AGED_DAYS,
               'date_received': i.DATE_RECEIVED,
               'actual_status': i.ACTUAL_STATUS,
-              'check': check
+              'check': check,
+              'sysStatus': i.STATUS,
+              'comment': 'comment'
             });
           }
           return _this.fetchDataFromOSFM();
@@ -129,15 +131,25 @@
     },
     methods: {
       reportPack: function(e) {
+        var toUpdate;
         e.preventDefault();
         if (this.carriers[this.selectedpack] != null) {
+          toUpdate = this.carriers[this.selectedpack];
           return util.reportPack.get({
             carrier: this.carriers[this.selectedpack].carrier
           }, (function(_this) {
             return function(data) {
-              return _this.carriers[_this.selectedpack].status = 5;
+              return toUpdate.fetchDataFromOSFM();
             };
           })(this));
+        } else {
+          return console.log('No carrier selected');
+        }
+      },
+      removeFromList: function() {
+        if (this.carriers[this.selectedpack] != null) {
+          console.log(this.selectedpack);
+          return this.carriers.splice(this.selectedpack, 1);
         } else {
           return console.log('No carrier selected');
         }

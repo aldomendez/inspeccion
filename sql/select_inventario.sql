@@ -4,7 +4,8 @@ select
   serial_num,
   carrier_serial_num,
   status actual_status,
-  db_status status,
+  db_status,
+  status,
   osfm_item item,
   osfm_location,
   comments

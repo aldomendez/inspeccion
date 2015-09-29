@@ -45,13 +45,15 @@ class Pack
         @contents.push {
           'carrier_site':i.CARRIER_SITE
           'serial_num':i.SERIAL_NUM
-          'status':i.STATUS
+          'status':i.DB_STATUS
           'item':i.ITEM
           'osfm_location':i.OSFM_LOCATION
           'aged_days':i.AGED_DAYS
           'date_received':i.DATE_RECEIVED
           'actual_status':i.ACTUAL_STATUS
           'check': check
+          'sysStatus':i.STATUS
+          'comment':'comment'
         }
       @fetchDataFromOSFM()
     # .error (data, status, request)->
@@ -92,9 +94,19 @@ window.vm = new Vue {
     reportPack:(e)->
       e.preventDefault()
       if @carriers[@selectedpack]?
+        toUpdate = @carriers[@selectedpack]
         util.reportPack.get {carrier:@carriers[@selectedpack].carrier}, (data)=>
-          @carriers[@selectedpack].status = 5
+          toUpdate.fetchDataFromOSFM()
        
+      else
+        console.log 'No carrier selected'
+    removeFromList:()->
+      # e.preventDefault()
+      if @carriers[@selectedpack]?
+        console.log @selectedpack
+        @carriers.splice @selectedpack,1
+        # util.reportPack.get {carrier:@carriers[@selectedpack].carrier}, (data)=>
+        #   @carriers[@selectedpack].status = 5
       else
         console.log 'No carrier selected'
     markAsOk:()->
