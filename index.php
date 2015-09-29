@@ -109,7 +109,7 @@ function report_a_carrier($carrier)
     $DB->setQuery($query);
     $DB->bind_vars(':actual_status', 'REJECTED');
     $DB->bind_vars(':carrier', $carrier);
-    echo $DB->query;
+    // echo $DB->query;
     $DB->exec();
     echo "[true]";
     $DB->close();
