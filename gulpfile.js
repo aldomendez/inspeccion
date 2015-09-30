@@ -3,6 +3,9 @@ var coffee = require('gulp-coffee');
 var gutil = require('gulp-util');
 var livereload = require('gulp-livereload');
 var wait = require('gulp-wait');
+var sourcemaps = require("gulp-sourcemaps");
+var babel = require("gulp-babel");
+var concat = require("gulp-concat");
 
 var DEST = '\\\\wmatvmlr401\\htdocs\\lr4\\check_osas';
 var BASE = __dirname;
@@ -22,11 +25,22 @@ copyAndReload = function copyAndReload (event) {
        .pipe(livereload());
 }
 
-copy = function copyAndReload (event) {
+babelAndReload = function babelAndReload (event){
+  var srvPath = serverPath(event.path)
+  console.log("babel: ", srvPath);
+  gulp.src(event.path)
+    .pipe(sourcemaps.init())
+    .pipe(babel()).on('error',gutil.log)
+    .pipe(concat("all.js"))
+    .pipe(sourcemaps.write("."))
+    .pipe(gulp.dest("js"))
+}
+
+copy = function copy (event) {
   console.log('Sended to: ',serverPath(event.path));
   gulp.src(event.path)
        .pipe(gulp.dest(DEST + serverPath(event.path)))
-       .pipe(livereload(0));
+       // .pipe(livereload(0));
 }
 
 compileAndPush = function compileAndPush (event) {
@@ -41,13 +55,16 @@ compileAndPush = function compileAndPush (event) {
     .pipe(livereload());
 }
 
-gulp.task('watch', function () {
+gulp.task('default', function () {
   livereload.listen();
   /*
     La siguiente es la lista de todo lo que esta observando gulp, 
     me gustaria que pudiera decirle cueles son las carpetas que 
     tiene que omitir.
   */
+  gulp.watch(["es6/**.js"]).on('change', function (event) {
+    babelAndReload(event);
+  });
   gulp.watch(['coffee/**.coffee'], function (event) {
   }).on('change', function (event) {
      compileAndPush(event);
@@ -62,7 +79,7 @@ gulp.task('watch', function () {
   });  
   gulp.watch(['js/**.map'], function (event) {
   }).on('change', function (event) {
-     copyAndReload(event);
+     copy(event);
   });  
   gulp.watch(['sql/**.sql'], function (event) {
   }).on('change', function (event) {
@@ -82,5 +99,5 @@ gulp.task('watch', function () {
   });
 });
 
-gulp.task('default', ['watch']);
+// gulp.task('default', ['watch']);
 console.log("Listening on folder: " + BASE);
