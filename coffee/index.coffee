@@ -15,6 +15,9 @@ util.generations = {
   },
   '5067-5071':{
     gen:'Gen3'
+  },
+  'LR4TSHIMF1':{
+    gen:'F1'
   }
 }
 util.statusCodes = [
@@ -45,7 +48,7 @@ class Pack
         @contents.push {
           'carrier_site':i.CARRIER_SITE
           'serial_num':i.SERIAL_NUM
-          'status':i.DB_STATUS
+          'status':i.DB_STATUS||i.STATUS
           'item':i.ITEM
           'osfm_location':i.OSFM_LOCATION
           'aged_days':i.AGED_DAYS
